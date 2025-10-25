@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Login — Demo Authentication</title>
+    <style>
+      :root {
+        --bg: #0f1724;
+        --card: #0b1220;
+        --accent: #4f46e5;
+        --muted: #94a3b8;
+        --danger: #ef4444;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #071025 0%, #071733 100%);
+        color: #e6eef8;
+      }
+      .card {
+        width: 360px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        padding: 28px;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+      }
+      h1 {
+        margin: 0 0 6px;
+        font-size: 20px;
+      }
+      p.lead {
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: transparent;
+        color: inherit;
+        font-size: 14px;
+      }
+      .field {
+        margin-bottom: 12px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .btn {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 0;
+        background: linear-gradient(90deg, var(--accent), #7c3aed);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 15px;
+      }
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .msg {
+        height: 18px;
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+      .msg.success {
+        color: #86efac;
+      }
+      .msg.error {
+        color: var(--danger);
+      }
+      .small {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .toggle {
+        background: transparent;
+        border: 0;
+        color: var(--accent);
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .footer {
+        margin-top: 12px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      @media (max-width: 420px) {
+        .card {
+          width: 92vw;
+          padding: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card" role="main">
+      <h1>Sign in</h1>
+      <p class="lead">Enter your email and password to access your account.</p>
+
+      <form id="loginForm" autocomplete="on" novalidate>
+        <div class="msg" id="message" aria-live="polite"></div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              required
+            />
+            <button
+              type="button"
+              class="toggle"
+              id="togglePwd"
+              aria-pressed="false"
+              title="Show password"
+            >
+              Show
+            </button>
+          </div>
+        </div>
+
+        <div class="meta">
+          <label style="display: flex; align-items: center; gap: 8px"
+            ><input type="checkbox" id="remember" />
+            <span class="small">Remember me</span></label
+          >
+          <a href="#" class="small">Forgot?</a>
+        </div>
+
+        <button class="btn" id="submitBtn" type="submit">Sign in</button>
+      </form>
+
+      <div class="footer">
+        <p class="small">
+          Demo credentials — <strong>selva@example.com</strong> /
+          <strong>password123</strong>
+        </p>
+      </div>
+    </main>
+
+    <script>
+      // Demo: fake user store (FOR LEARNING ONLY)
+      const demoUser = { email: "selva@example.com", password: "password123" };
+
+      const form = document.getElementById("loginForm");
+      const msg = document.getElementById("message");
+      const submitBtn = document.getElementById("submitBtn");
+      const toggle = document.getElementById("togglePwd");
+      const pwd = document.getElementById("password");
+
+      // Toggle password visibility
+      toggle.addEventListener("click", () => {
+        const isHidden = pwd.type === "password";
+        pwd.type = isHidden ? "text" : "password";
+        toggle.textContent = isHidden ? "Hide" : "Show";
+        toggle.setAttribute("aria-pressed", String(isHidden));
+      });
+
+      // Simple client-side validation
+      function validate(email, password) {
+        if (!email) return "Email is required.";
+        if (!/^\S+@\S+\.\S+$/.test(email)) return "Enter a valid email.";
+        if (!password) return "Password is required.";
+        if (password.length < 6)
+          return "Password must be at least 6 characters.";
+        return "";
+      }
+
+      // Fake authentication (simulate server call)
+      function fakeAuth(email, password) {
+        return new Promise((resolve, reject) => {
+          // simulate network latency
+          setTimeout(() => {
+            if (email === demoUser.email && password === demoUser.password) {
+              // return fake token
+              resolve({ token: "fake-jwt-token-12345", user: { email } });
+            } else {
+              reject(new Error("Invalid email or password"));
+            }
+          }, 800);
+        });
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        msg.textContent = "";
+        msg.className = "msg";
+
+        const email = (document.getElementById("email").value || "").trim();
+        const password = document.getElementById("password").value || "";
+        const remember = document.getElementById("remember").checked;
+
+        const err = validate(email, password);
+        if (err) {
+          msg.textContent = err;
+          msg.classList.add("error");
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Signing in...";
+
+        try {
+          const res = await fakeAuth(email, password);
+          msg.textContent = "Signed in! Redirecting…";
+          msg.classList.add("success");
+
+          // store token (demo). In real app use HttpOnly secure cookie set by server.
+          if (remember) localStorage.setItem("authToken", res.token);
+          else sessionStorage.setItem("authToken", res.token);
+
+          // simulate redirect
+          setTimeout(() => {
+            // replace this with window.location = '/dashboard' in real app
+            alert(
+              "Login successful (demo). Token stored to " +
+                (remember ? "localStorage" : "sessionStorage")
+            );
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Sign in";
+          }, 500);
+        } catch (error) {
+          msg.textContent = error.message || "Login failed";
+          msg.classList.add("error");
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Sign in";
+        }
+      });
+    </script>
+  </body>
+</html>
